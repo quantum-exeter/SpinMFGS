@@ -41,8 +41,8 @@ Threads.@threads for d in ProgressBar(idx)
     s_qwk[j,n,m,1] = Sx_QWK(1/T[m], S0[j], J, ζ0, θ0)
     s_qwk[j,n,m,3] = Sz_QWK(1/T[m], S0[j], J, ζ0, θ0)
   end
-  s_qgv[n,m,1] = Sx_QGV(1/T[m], ζ[n])
-  s_qgv[n,m,3] = Sz_QGV(1/T[m], ζ[n])
+  s_qgv[n,m,1] = Sx_QGV(1/T[m], ζ[n], θ0)
+  s_qgv[n,m,3] = Sz_QGV(1/T[m], ζ[n], θ0)
 end
 
 for m in 1:length(T)
