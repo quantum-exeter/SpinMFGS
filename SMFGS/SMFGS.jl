@@ -24,6 +24,7 @@ include("auxmath.jl")
 include("adim.jl")
 
 include("SpectralDensity.jl")
+include("SDIntegrals.jl")
 
 include("CG.jl")
 include("QG.jl")
