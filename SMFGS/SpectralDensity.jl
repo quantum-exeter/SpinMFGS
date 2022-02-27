@@ -2,8 +2,16 @@
 
 abstract type SpectralDensity end
 
+function sd(J::SpectralDensity, ω)
+  return sdinvω(J,ω)*ω
+end
+
+function sdinvω(J::SpectralDensity, ω)
+  return sd(J,ω)/ω
+end
+
 function reorgenergy(J::SpectralDensity)
-  return quadgk(ω -> sd(J,ω)/ω, 0.0, Inf)[1]
+  return quadgk(ω -> sdinvω(J,ω), 0.0, Inf)[1]
 end
 
 ## Lorentzian Spectral Density ##
@@ -14,8 +22,8 @@ struct LorentzianSD{T<:Real} <: SpectralDensity
   Γ::T
 end
 
-function sd(J::LorentzianSD, ω)
-  iszero(ω) ? zero(ω) : (J.α*J.Γ/π)*ω/((ω^2 - J.ω0^2)^2 + (J.Γ*ω)^2)
+function sdinvω(J::LorentzianSD, ω)
+  return (J.α*J.Γ/π)/((ω^2 - J.ω0^2)^2 + (J.Γ*ω)^2)
 end
 
 reorgenergy(J::LorentzianSD) = (J.α/J.ω0^2)/2
@@ -27,8 +35,8 @@ struct OhmicSD{T<:Real} <: SpectralDensity
   ωc::T
 end
 
-function sd(J::OhmicSD, ω)
-  return J.α*ω*exp(-ω/J.ωc)
+function sdinvω(J::OhmicSD, ω)
+  return J.α*exp(-ω/J.ωc)
 end
 
 reorgenergy(J::OhmicSD) = J.α*J.ωc
@@ -41,8 +49,8 @@ struct PolySD{T<:Real} <: SpectralDensity
   ωc::T
 end
 
-function sd(J::PolySD, ω)
-  return α*((ω^n)/(ωc^(n-1)))*exp(-ω/ωc)
+function sdinvω(J::PolySD, ω)
+  return J.α*((ω/J.ωc)^(J.n-1))*exp(-ω/J.ωc)
 end
 
 reorgenergy(J::PolySD) = J.α*J.ωc*factorial(J.n-1)
@@ -54,8 +62,8 @@ struct DrudeLorentzSD{T<:Real} <: SpectralDensity
     ωD::T
 end
 
-function sd(J::DrudeLorentzSD, ω)
-  return (2/π)*J.γ*J.ωD*ω/(ω^2 + J.ωD^2)
+function sdinvω(J::DrudeLorentzSD, ω)
+  return (2/π)*J.γ*J.ωD/(ω^2 + J.ωD^2)
 end
 
 reorgenergy(J::DrudeLorentzSD) = J.γ
