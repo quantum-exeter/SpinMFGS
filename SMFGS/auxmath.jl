@@ -62,6 +62,22 @@ function integrate_semi_real(f, singularity = nothing)
   return integrand_eval
 end
 
+## Principal value integrals with quadgk ##
+function quadgk_cauchy(f, a, c, b)
+  fc = f(c)
+  g(x) = (f(x) - fc)/(x - c)
+  I = quadgk(g, a, c, b)
+  C = fc*log(abs((b - c)/(a - c))) 
+  return (I[1] + C, I[2], C)
+end
+
+function quadgk_hadamard(f, a, c, b)
+  df(x) = ForwardDiff.derivative(f,x)
+  I = quadgk_cauchy(df, a, c, b)
+  C = f(a)/(a-c) - f(b)/(b-c)
+  return (C + I[1], I[2], C)
+end
+
 ## Spherical coordinates ##
 @inline xsph(θ, φ) = sin(θ)*cos(φ)
 @inline ysph(θ, φ) = sin(θ)*sin(φ)
