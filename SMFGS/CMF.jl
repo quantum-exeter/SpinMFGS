@@ -108,7 +108,41 @@ function Sx_CMF_pfdrv(β, ζ, θ0)
   return Float64(s)
 end
 
-S_CMF = S_CMF_pfdrv_fast
+## Classical HMF spin expectation values ##
+## derivating the partition function with automatic differentiation ##
+function S_CMF_pfad(β, ζ, θ0)
+  T = seltype(β, ζ)
+  logZ(B) = log(dblquadgk((θ_,φ_) -> exp(-β*(H_CMF(θ_,φ_,ζ,θ0,B)))*dΩ(θ_,φ_), [0.0, 0.0], [π, 2π]))
+  dlogZ = ForwardDiff.gradient(logZ, T[0.0; 0.0; 1.0])
+  s = -(1/β)*dlogZ
+  return Float64.(s)
+end
+
+function S_CMF_pfad_fast(β, ζ, θ0)
+  T = seltype(β, ζ)
+  logZ(B) = log(dblquadgk((θ_,φ_) -> exp(-β*(H_CMF(θ_,φ_,ζ,θ0,[B[1];0.0;B[2]])))*dΩ(θ_,φ_), [0.0, 0.0], [π, 2π]))
+  dlogZ = ForwardDiff.gradient(logZ, T[0.0; 1.0])
+  s = -(1/β)*dlogZ
+  return Float64[s[1] ; 0.0 ; s[2]]
+end
+
+function Sz_CMF_pfad(β, ζ, θ0)
+  T = seltype(β, ζ)
+  logZ(B) = log(dblquadgk((θ_,φ_) -> exp(-β*(H_CMF(θ_,φ_,ζ,θ0,[0.0;0.0;B])))*dΩ(θ_,φ_), [0.0, 0.0], [π, 2π]))
+  dlogZ = ForwardDiff.derivative(logZ, T(1.0))
+  s = -(1/β)*dlogZ
+  return Float64(s)
+end
+
+function Sx_CMF_pfad(β, ζ, θ0)
+  T = seltype(β, ζ)
+  logZ(B) = log(dblquadgk((θ_,φ_) -> exp(-β*(H_CMF(θ_,φ_,ζ,θ0,[B;0.0;1.0])))*dΩ(θ_,φ_), [0.0, 0.0], [π, 2π]))
+  dlogZ = ForwardDiff.derivative(logZ, T(0.0))
+  s = -(1/β)*dlogZ
+  return Float64(s)
+end
+
+S_CMF = S_CMF_pfad_fast
 
 ## Classical HMF T=0 expectation values ##
 function S_CMF_T0(ζ, θ0)
