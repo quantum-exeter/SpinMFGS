@@ -9,7 +9,7 @@ function GeomRange(start, stop, len::Integer)
 end
 
 ## x*coth(x) function with special treatment of x=0 ##
-xcoth(x) = iszero(x) ? 1.0 : x*coth(x)
+xcoth(x) = iszero(x) ? one(x) : x*coth(x)
 
 ## Sinh(x)/x ##
 sinhc(x::Real) = real(sinc(1im*x/π))
