@@ -2,15 +2,15 @@
 
 ## Quantum Sz weak coupling ##
 ## using QG expectation values ##
-function Sz_QWK(β, S0::Rational, J::SpectralDensity, ζ0, θ0; ε=1e-10)
+function Sz_QWK(β, S0::Union{Int,Rational}, J::SpectralDensity, ζ0, θ0)
   Sz   = Sz_QG(β, S0)
   Szz  = Szz_QG(β, S0)
   Szzz = Szzz_QG(β, S0)
 
-  Σ1 = ζ0*Σ(J, ε=ε)
-  Σ2 = ζ0*Σ′(J, ε=ε)
-  Δ1 = ζ0*Δ(J, β, S0, ε=ε)/S0
-  Δ2 = ζ0*Δ′(J, β, S0, ε=ε)/S0
+  Σ1 = ζ0*Σ(J)
+  Σ2 = ζ0*Σ′(J)
+  Δ1 = ζ0*Δ(J, β, S0)/S0
+  Δ2 = ζ0*Δ′(J, β, S0)/S0
   Q  = ζ0*reorgenergy(J)
 
   invS0 = 1/S0
@@ -27,16 +27,14 @@ function Sz_QWK(β, S0::Rational, J::SpectralDensity, ζ0, θ0; ε=1e-10)
   return Sz
 end
 
-Sz_QWK(β, S0::Int, J::SpectralDensity, ζ0, θ0; ε=1e-10) = Sz_QWK(β, S0//1, J, ζ0, θ0, ε=ε)
-
 ## Quantum Sx weak coupling ##
 ## using QG expectation values ##
-function Sx_QWK(β, S0::Rational, J::SpectralDensity, ζ0, θ0; ε=1e-10)
+function Sx_QWK(β, S0::Union{Int,Rational}, J::SpectralDensity, ζ0, θ0)
   Sz   = Sz_QG(β, S0)
   Szz  = Szz_QG(β, S0)
 
-  Σ1 = ζ0*Σ(J, ε=ε)
-  Δ1 = ζ0*Δ(J, β, S0, ε=ε)/S0
+  Σ1 = ζ0*Σ(J)
+  Δ1 = ζ0*Δ(J, β, S0)/S0
   Q  = ζ0*reorgenergy(J)
 
   invS0 = 1/S0
@@ -48,5 +46,3 @@ function Sx_QWK(β, S0::Rational, J::SpectralDensity, ζ0, θ0; ε=1e-10)
   Sx = prefact*(term1 + term2 + term3)
   return Sx
 end
-
-Sx_QWK(β, S0::Int, J::SpectralDensity, ζ0, θ0; ε=1e-10) = Sx_QWK(β, S0//1, J, ζ0, θ0, ε=ε)
