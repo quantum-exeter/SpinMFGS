@@ -1,6 +1,8 @@
 module SMFGS
 
 using LinearAlgebra
+using Kronecker
+using Statistics
 using StaticArrays
 using Quadmath, DoubleFloats
 using QuadGK
@@ -15,6 +17,7 @@ export Sz_CG,
        Sz_CUS, Sx_CUS,
        Sz_QUS, Sx_QUS,
        S_CMF,  S_CMF_T0, S_CMF_ground, Pdens_CMF,
+       S_QRC, precompute_operators_QRC,
        Sz_QGV, Sx_QGV, QGV_bound,
        GeomRange,
        LorentzianSD, OhmicSD, DrudeLorentzSD
@@ -37,6 +40,7 @@ include("QUS.jl")
 
 include("CMF.jl")
 
+include("QRC.jl")
 include("QGV.jl")
 
 end

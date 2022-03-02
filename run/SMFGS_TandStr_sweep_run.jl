@@ -27,12 +27,15 @@ S0 = 1//2
 #filename = "../data/CMF_TandStr_sweep_hdapt2.npz"
 #T = GeomRange(1e-3, 1e+4, 7*15)
 #ζ = GeomRange(1e-6, 1e+5, 11*15)
-#S0 = 1000
+#S0 = 1//2
 
 ζ0 = 1
-ω0, Γ = 7.0, 5.0
+#ω0, Γ = 7.0, 5.0 #[prm5]
+ω0, Γ = 7.0, 0.01 #[prmQRC]
 α = (2*ω0^2)*(ζ./ζ0)
 θ0 = π/4
+
+Ncutoff = [max(round(Int64, 200*log10(x) + 400), 400) for x in ζ]
 
 println("Running for")
 println(min(T...), " ", max(T...), " ", length(T))
@@ -46,6 +49,7 @@ s_css = zeros((length(ζ), 3))
 s_gnd = zeros((length(ζ), 3))
 s_qgs = zeros((length(T), 3))
 s_qwk = zeros((length(ζ), length(T), 3))
+s_qrc = zeros((length(ζ), length(T), 3))
 s_qgv = zeros((length(ζ), length(T), 3))
 
 idx = [id for id in Iterators.product(1:length(ζ), 1:length(T))]
@@ -61,6 +65,13 @@ Threads.@threads for d in ProgressBar(idx)
   s_qwk[n,m,3] = Sz_QWK(1/T[m], S0, J, ζ0, θ0)
 end
 
+for n in ProgressBar(1:length(ζ))
+  operators = precompute_operators_QRC(S0, Ncutoff[n])
+  Threads.@threads for m in 1:length(T)
+    s_qrc[n,m,:] = S_QRC(1/T[m], S0, α[n], ω0, θ0; operators=operators)
+  end
+end
+
 Threads.@threads for m in 1:length(T)
   s_cgs[m,3] = Sz_CG(1/T[m])
   s_cus[m,1] = Sx_CUS(1/T[m], θ0)
@@ -74,8 +85,8 @@ Threads.@threads for n in 1:length(ζ)
 end
  
 npzwrite(filename,
-  Dict("T" => T, "zeta" => ζ, "theta" => θ0,
+  Dict("T" => T, "zeta" => ζ, "theta" => θ0, "Ncutoff" => Ncutoff,
        "scmf" => s_cmf, "scwk" => s_cwk, "scgs" => s_cgs, "scus" => s_cus,
        "scss" => s_css, "sgnd" => s_gnd,
-       "sqgs" => s_qgs, "sqwk" => s_qwk, "sqgv" => s_qgv));
+       "sqgs" => s_qgs, "sqwk" => s_qwk, "sqgv" => s_qgv, "sqrc" => s_qrc));
 
